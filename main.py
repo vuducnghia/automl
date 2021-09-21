@@ -9,6 +9,9 @@ from utils.encode_label import LabelEncoder
 from model.model import setup_callback, ODHyperModel
 from keras_tuner import RandomSearch
 
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.allow_growth = True
+sess = tf.compat.v1.Session(config=config)
 
 url = "https://github.com/srihari-humbarwadi/datasets/releases/download/v0.1.0/data.zip"
 filename = os.path.join(os.getcwd(), "data.zip")
