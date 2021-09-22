@@ -103,5 +103,7 @@ class LabelEncoder:
         for i in range(batch_size):
             label = self._encode_sample(images_shape, gt_boxes[i], cls_ids[i])
             labels = labels.write(i, label)
-        batch_images = tf.keras.applications.resnet.preprocess_input(batch_images)
+        # batch_images = tf.keras.applications.resnet.preprocess_input(batch_images)
+        batch_images /= 127.5
+        batch_images -= 1.
         return batch_images, labels.stack()
