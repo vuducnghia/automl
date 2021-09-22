@@ -68,7 +68,7 @@ def resize_and_pad_image(image, min_side=224, max_side=448.0, jitter=[640, 1024]
     return image, image_shape, ratio
 
 
-def preprocess_data(sample):
+def preprocess_data(sample, image_shape = (224, 224)):
     """Applies preprocessing step to a single sample
 
     Arguments:
@@ -86,7 +86,8 @@ def preprocess_data(sample):
     class_id = tf.cast(sample["objects"]["label"], dtype=tf.int32)
 
     image, bbox = random_flip_horizontal(image, bbox)
-    image, image_shape, _ = resize_and_pad_image(image, jitter=None)
+    # image, image_shape, _ = resize_and_pad_image(image, jitter=None)
+    image = tf.image.resize(image, (224, 224))
 
     bbox = tf.stack(
         [
