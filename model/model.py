@@ -42,7 +42,7 @@ class ObjectDetectionNet(Model):
 class ODHyperModel(HyperModel):
     def __init__(self, num_classes):
         self.num_classes = num_classes
-        self.learning_rate_fn = setup_learning_rate()
+        self.learning_rate_fn = self.setup_learning_rate()
         self.loss_fn = Loss(num_classes)
         self.optimizer = tf.optimizers.SGD(learning_rate=self.learning_rate_fn, momentum=0.9)
 
@@ -53,29 +53,17 @@ class ODHyperModel(HyperModel):
 
         return model
 
+    def setup_learning_rate(self):
+        learning_rates = [2.5e-06, 0.000625, 0.00125, 0.0025, 0.00025, 2.5e-05]
+        learning_rate_boundaries = [125, 250, 500, 240000, 360000]
+        learning_rate_fn = tf.optimizers.schedules.PiecewiseConstantDecay(
+            boundaries=learning_rate_boundaries, values=learning_rates
+        )
 
-# def build_model(hp, num_classes):
-#     learning_rate_fn = setup_learning_rate()
-#     loss_fn = Loss(num_classes)
-#     model = ObjectDetectionNet(hp, num_classes)
-#
-#     optimizer = tf.optimizers.SGD(learning_rate=learning_rate_fn, momentum=0.9)
-#     model.compile(loss=loss_fn, optimizer=optimizer)
-#
-#     return model
+        return learning_rate_fn
 
 
-def setup_learning_rate():
-    learning_rates = [2.5e-06, 0.000625, 0.00125, 0.0025, 0.00025, 2.5e-05]
-    learning_rate_boundaries = [125, 250, 500, 240000, 360000]
-    learning_rate_fn = tf.optimizers.schedules.PiecewiseConstantDecay(
-        boundaries=learning_rate_boundaries, values=learning_rates
-    )
-
-    return learning_rate_fn
-
-
-def setup_callback(model_dir):
+def setup_callback(model_dir="my_dir"):
     callbacks_list = [
         tf.keras.callbacks.ModelCheckpoint(
             filepath=os.path.join(model_dir, "weights" + "_epoch_{epoch}"),

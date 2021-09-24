@@ -1,4 +1,4 @@
-from tensorflow.keras.layers import Input, Conv2D, ReLU
+from tensorflow.keras.layers import InputLayer, Conv2D, ReLU
 import tensorflow as tf
 
 
@@ -13,7 +13,7 @@ def build_head(output_filters, bias_init):
       A keras sequential model representing either the classification
         or the box regression head depending on `output_filters`.
     """
-    head = tf.keras.Sequential([Input(shape=[None, None, 256])])
+    head = tf.keras.Sequential([InputLayer(input_shape=[None, None, 256])])
     kernel_init = tf.initializers.RandomNormal(0.0, 0.01)
     for _ in range(4):
         head.add(Conv2D(256, 3, padding="same", kernel_initializer=kernel_init))
