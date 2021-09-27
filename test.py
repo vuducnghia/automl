@@ -62,9 +62,9 @@ tuner = RandomSearch(
 )
 tuner.search_space_summary()
 tuner.search(
-    train_dataset.take(10),
+    train_dataset,
     epochs=2,
-    validation_data=val_dataset.take(5),
+    validation_data=val_dataset,
     steps_per_epoch=steps_per_epoch,
     validation_steps=validation_steps,
     # callbacks=setup_callback

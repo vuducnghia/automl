@@ -73,7 +73,7 @@ def build_model(hp):
 
     return model
 
-def setup_learning_rate(self):
+def setup_learning_rate():
     learning_rates = [2.5e-06, 0.000625, 0.00125, 0.0025, 0.00025, 2.5e-05]
     learning_rate_boundaries = [125, 250, 500, 240000, 360000]
     learning_rate_fn = tf.optimizers.schedules.PiecewiseConstantDecay(
