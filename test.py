@@ -6,7 +6,8 @@ from tensorflow import keras
 import tensorflow_datasets as tfds
 from utils.preprocessing import preprocess_data
 from utils.encode_label import LabelEncoder
-from model.model import setup_callback, ODHyperModel, build_model
+from model.model import setup_callback, ODHyperModel, setup_learning_rate, ObjectDetectionNet
+from model.loss import Loss
 from keras_tuner import RandomSearch
 
 config = tf.compat.v1.ConfigProto()
@@ -47,28 +48,39 @@ val_dataset = val_dataset.map(label_encoder.encode_batch, num_parallel_calls=aut
 val_dataset = val_dataset.apply(tf.data.experimental.ignore_errors())
 val_dataset = val_dataset.prefetch(autotune)
 
-
 steps_per_epoch = int(40670 / batch_size)
 validation_steps = int(5000 / batch_size)
+model = ObjectDetectionNet(None, 80)
+learning_rate_fn = setup_learning_rate()
+loss_fn = Loss(80)
+optimizer = tf.optimizers.SGD(learning_rate=learning_rate_fn, momentum=0.9)
+model.compile(loss=loss_fn, optimizer=optimizer)
+model.fit(
+    train_dataset.take(100),
+    validation_data=val_dataset.take(50),
+    epochs=epochs,
+    # callbacks=callbacks_list,
+    verbose=1,
+)
+# tuner = RandomSearch(
+#     build_model,
+#     objective="val_loss",
+#     max_trials=2,
+#     executions_per_trial=1,
+#     overwrite=True,
+#     directory="my_dir",
+#     project_name="helloworld",
+# )
+# tuner.search_space_summary()
+# tuner.search(
+#     train_dataset,
+#     epochs=2,
+#     validation_data=val_dataset,
+#     steps_per_epoch=steps_per_epoch,
+#     validation_steps=validation_steps,
+#     # callbacks=setup_callback
+# )
+# best_model = tuner.get_best_models(num_models=1)[0]
+# best_model.fit(train_dataset, )
+# best_model.save("best_model")
 
-tuner = RandomSearch(
-    build_model,
-    objective="val_loss",
-    max_trials=2,
-    executions_per_trial=1,
-    overwrite=True,
-    directory="my_dir",
-    project_name="helloworld",
-)
-tuner.search_space_summary()
-tuner.search(
-    train_dataset,
-    epochs=2,
-    validation_data=val_dataset,
-    steps_per_epoch=steps_per_epoch,
-    validation_steps=validation_steps,
-    # callbacks=setup_callback
-)
-best_model = tuner.get_best_models(num_models=1)[0]
-best_model.fit(train_dataset, )
-best_model.save("best_model")

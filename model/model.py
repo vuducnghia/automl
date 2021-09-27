@@ -16,8 +16,8 @@ class ObjectDetectionNet(Model):
         super(ObjectDetectionNet, self).__init__(name="ObjectDetectionNet")
         self.num_classes = num_classes
 
-        self.backbone = get_backbone(hp)
-        # self.backbone = get_backbone(hp, "MobileNetV2")
+        # self.backbone = get_backbone(hp)
+        self.backbone = get_backbone(hp, "MobileNetV2")
         self.fpn = FeaturePyramid()
 
         prior_probability = tf.constant_initializer(-np.log((1 - 0.01) / 0.01))
@@ -61,17 +61,6 @@ class ODHyperModel(HyperModel):
         )
 
         return learning_rate_fn
-
-def build_model(hp):
-    num_classes = 80
-    loss_fn = Loss(num_classes)
-    learning_rate_fn = setup_learning_rate()
-    optimizer = tf.optimizers.SGD(learning_rate=learning_rate_fn, momentum=0.9)
-    model = ObjectDetectionNet(hp, num_classes)
-
-    model.compile(loss=loss_fn, optimizer=optimizer)
-
-    return model
 
 def setup_learning_rate():
     learning_rates = [2.5e-06, 0.000625, 0.00125, 0.0025, 0.00025, 2.5e-05]
