@@ -56,8 +56,8 @@ loss_fn = Loss(80)
 optimizer = tf.optimizers.SGD(learning_rate=learning_rate_fn, momentum=0.9)
 model.compile(loss=loss_fn, optimizer=optimizer)
 model.fit(
-    train_dataset.take(100),
-    validation_data=val_dataset.take(50),
+    train_dataset,
+    validation_data=val_dataset,
     epochs=epochs,
     # callbacks=callbacks_list,
     verbose=1,
