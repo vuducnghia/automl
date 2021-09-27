@@ -48,8 +48,9 @@ val_dataset = val_dataset.map(label_encoder.encode_batch, num_parallel_calls=aut
 val_dataset = val_dataset.apply(tf.data.experimental.ignore_errors())
 val_dataset = val_dataset.prefetch(autotune)
 
-steps_per_epoch = int(40670 / batch_size)
-validation_steps = int(5000 / batch_size)
+train_steps_per_epoch = dataset_info.splits["train"].num_examples
+val_steps_per_epoch = dataset_info.splits["validation"].num_examples // batch_size
+
 model = ObjectDetectionNet(None, 80)
 learning_rate_fn = setup_learning_rate()
 loss_fn = Loss(80)
@@ -57,8 +58,10 @@ optimizer = tf.optimizers.SGD(learning_rate=learning_rate_fn, momentum=0.9)
 model.compile(loss=loss_fn, optimizer=optimizer)
 model.fit(
     train_dataset,
+    steps_per_epoch=train_steps_per_epoch,
     validation_data=val_dataset,
     epochs=epochs,
+    validation_steps=val_steps_per_epoch,
     # callbacks=callbacks_list,
     verbose=1,
 )
@@ -83,4 +86,3 @@ model.fit(
 # best_model = tuner.get_best_models(num_models=1)[0]
 # best_model.fit(train_dataset, )
 # best_model.save("best_model")
-
