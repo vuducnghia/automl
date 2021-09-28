@@ -1,7 +1,6 @@
 from tensorflow.keras import Model
 from .feature_pyramid import FeaturePyramid
 from .head import build_head
-from .backbone import get_backbone
 import tensorflow as tf
 import numpy as np
 import os
@@ -16,8 +15,8 @@ class ObjectDetectionNet(Model):
         super(ObjectDetectionNet, self).__init__(name="ObjectDetectionNet")
         self.num_classes = num_classes
 
-        # self.backbone = get_backbone(hp)
-        self.backbone = get_backbone(hp, "MobileNetV2")
+        self.backbone = get_backbone(hp)
+        # self.backbone = get_backbone(hp, "MobileNetV2")
         self.fpn = FeaturePyramid()
 
         prior_probability = tf.constant_initializer(-np.log((1 - 0.01) / 0.01))
@@ -70,7 +69,8 @@ def setup_learning_rate():
     )
 
     return learning_rate_fn
-def setup_callback(model_dir="my_dir"):
+
+def setup_callback(model_dir="my_model"):
     callbacks_list = [
         tf.keras.callbacks.ModelCheckpoint(
             filepath=os.path.join(model_dir, "weights" + "_epoch_{epoch}"),

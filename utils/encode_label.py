@@ -92,6 +92,7 @@ class LabelEncoder:
         cls_target = tf.where(tf.equal(ignore_mask, 1.0), -2.0, cls_target)
         cls_target = tf.expand_dims(cls_target, axis=-1)
         label = tf.concat([box_target, cls_target], axis=-1)
+
         return label
 
     def encode_batch(self, batch_images, gt_boxes, cls_ids):
@@ -106,4 +107,5 @@ class LabelEncoder:
         # batch_images = tf.keras.applications.resnet.preprocess_input(batch_images)
         batch_images /= 127.5
         batch_images -= 1.
+
         return batch_images, labels.stack()

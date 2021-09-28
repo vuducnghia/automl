@@ -75,7 +75,7 @@ class AnchorBox:
 
     def get_anchors(self, image_height, image_width):
         """Generates anchor boxes for all the feature maps of the feature pyramid.
-
+        The anchors have the areas of 8² to 128² on pyramid levels from P3 to P7 respectively
         Arguments:
           image_height: Height of the input image.
           image_width: Width of the input image.

@@ -20,9 +20,7 @@ def get_backbone(hp, backbone=None):
             backbone.get_layer(layer_name).output
             for layer_name in ["conv3_block4_out", "conv4_block6_out", "conv5_block3_out"]
         ]
-        return Model(
-            inputs=[backbone.inputs], outputs=[c3_output, c4_output, c5_output]
-        )
+        return Model(inputs=[backbone.inputs], outputs=[c3_output, c4_output, c5_output])
     elif backbone == "InceptionV3":
         pass
     elif backbone == "DenseNet169":
@@ -41,9 +39,7 @@ def get_backbone(hp, backbone=None):
             backbone.get_layer(layer_name).output
             for layer_name in ["pool3_relu", "pool4_relu", "relu"]
         ]
-        return Model(
-            inputs=[backbone.inputs], outputs=[c3_output, c4_output, c5_output]
-        )
+        return Model(inputs=[backbone.inputs], outputs=[c3_output, c4_output, c5_output])
     elif backbone == "DenseNet121":
         """
         Builds DenseNet169 with pre-trained imagenet weights
@@ -60,9 +56,7 @@ def get_backbone(hp, backbone=None):
             backbone.get_layer(layer_name).output
             for layer_name in ["pool3_relu", "pool4_relu", "relu"]
         ]
-        return Model(
-            inputs=[backbone.inputs], outputs=[c3_output, c4_output, c5_output]
-        )
+        return Model(inputs=[backbone.inputs], outputs=[c3_output, c4_output, c5_output])
     elif backbone == "MobileNetV2":
         """
         Builds MobileNetV2 with pre-trained imagenet weights
@@ -79,6 +73,4 @@ def get_backbone(hp, backbone=None):
             backbone.get_layer(layer_name).output
             for layer_name in ["block_6_expand_relu", "block_13_expand_relu", "out_relu"]
         ]
-        return Model(
-            inputs=[backbone.inputs], outputs=[c3_output, c4_output, c5_output]
-        )
+        return Model(inputs=[backbone.inputs], outputs=[c3_output, c4_output, c5_output])
