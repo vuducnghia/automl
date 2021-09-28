@@ -9,14 +9,13 @@ from utils.encode_label import LabelEncoder
 from model.model import setup_callback, ODHyperModel
 from keras_tuner import RandomSearch
 
-
 BATCH_SIZE = 2
 EPOCHS = 10
 
 
 def create_dataset():
     (train_dataset, val_dataset, test_dataset), dataset_info = tfds.load("coco/2017",
-                                                                         split=["validation", "test"],
+                                                                         split=["training", "validation", "test"],
                                                                          with_info=True,
                                                                          data_dir="data")
 
@@ -29,7 +28,7 @@ def create_dataset():
                                                padding_values=(0.0, 1e-8, -1),
                                                drop_remainder=True)
     train_dataset = train_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
-    train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
+    # train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
     train_dataset = train_dataset.prefetch(autotune)
 
     val_dataset = val_dataset.map(preprocess_data, num_parallel_calls=autotune)
@@ -38,15 +37,14 @@ def create_dataset():
                                            padding_values=(0.0, 1e-8, -1),
                                            drop_remainder=True)
     val_dataset = val_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
-    val_dataset = val_dataset.apply(tf.data.experimental.ignore_errors())
+    # val_dataset = val_dataset.apply(tf.data.experimental.ignore_errors())
     val_dataset = val_dataset.prefetch(autotune)
 
     test_dataset = test_dataset.map(preprocess_data, num_parallel_calls=autotune)
     test_dataset = test_dataset.padded_batch(BATCH_SIZE,
-                                           padding_values=(0.0, 1e-8, -1),
-                                           drop_remainder=True)
+                                             padding_values=(0.0, 1e-8, -1),
+                                             drop_remainder=True)
     test_dataset = test_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
-    test_dataset = test_dataset.apply(tf.data.experimental.ignore_errors())
     test_dataset = test_dataset.prefetch(autotune)
 
     return train_dataset, val_dataset, test_dataset, dataset_info
