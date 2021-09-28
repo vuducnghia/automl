@@ -15,7 +15,7 @@ EPOCHS = 10
 
 def create_dataset():
     (train_dataset, val_dataset, test_dataset), dataset_info = tfds.load("coco/2017",
-                                                                         split=["training", "validation", "test"],
+                                                                         split=["train", "validation", "test"],
                                                                          with_info=True,
                                                                          data_dir="data")
 
