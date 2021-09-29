@@ -1,7 +1,6 @@
 import tensorflow as tf
 from utils.convert_box import swap_xy, convert_to_xywh
 from configs import INPUT_SHAPE
-from keras.applications.vgg16 import preprocess_input
 
 
 def random_flip_horizontal(image, boxes):

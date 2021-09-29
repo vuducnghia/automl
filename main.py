@@ -7,13 +7,13 @@ from utils.preprocessing import preprocess_data
 from utils.encode_label import LabelEncoder
 from model.model import setup_callback, ODHyperModel, ObjectDetectionNet
 from keras_tuner import RandomSearch
+from configs import NUM_CLASSES, BATCH_SIZE, EPOCHS
 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
 sess = tf.compat.v1.Session(config=config)
 
-BATCH_SIZE = 2
-EPOCHS = 10
+
 
 
 def create_dataset():
@@ -31,7 +31,7 @@ def create_dataset():
                                                padding_values=(0.0, 1e-8, -1),
                                                drop_remainder=True)
     train_dataset = train_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
-    train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
+    # train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
     train_dataset = train_dataset.prefetch(autotune)
 
     val_dataset = val_dataset.map(preprocess_data, num_parallel_calls=autotune)
@@ -40,14 +40,16 @@ def create_dataset():
                                            padding_values=(0.0, 1e-8, -1),
                                            drop_remainder=True)
     val_dataset = val_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
-    val_dataset = val_dataset.apply(tf.data.experimental.ignore_errors())
+    # val_dataset = val_dataset.apply(tf.data.experimental.ignore_errors())
     val_dataset = val_dataset.prefetch(autotune)
 
     test_dataset = test_dataset.map(preprocess_data, num_parallel_calls=autotune)
+    test_dataset = test_dataset.shuffle(8 * BATCH_SIZE)
     test_dataset = test_dataset.padded_batch(BATCH_SIZE,
                                              padding_values=(0.0, 1e-8, -1),
                                              drop_remainder=True)
     test_dataset = test_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
+    # test_dataset = test_dataset.apply(tf.data.experimental.ignore_errors())
     test_dataset = test_dataset.prefetch(autotune)
 
     return train_dataset, val_dataset, test_dataset, dataset_info
@@ -85,14 +87,14 @@ def main():
     # best_model = tuner.get_best_models(num_models=1)[0]
     # best_model.fit(train_dataset, )
     # best_model.save("best_model")
-    model = ObjectDetectionNet(None, 80)
+    model = ObjectDetectionNet(None, NUM_CLASSES)
     # model.build((None,512, 512, 3))
-    # for i in train_dataset.take(1):
-    #     preprocess_data(i)
+
+
     optimizer = tf.optimizers.SGD(learning_rate=0.01, momentum=0.9)
-    loss_fn=Loss(80)
+    loss_fn=Loss(NUM_CLASSES)
     model.compile(loss=loss_fn, optimizer=optimizer)
-    model.fit(train_dataset.take(4), validation_data=val_dataset.take(1), steps_per_epoch=1, validation_steps=1, epochs=1)
+    model.fit(test_dataset, validation_data=val_dataset, steps_per_epoch=1, validation_steps=1, epochs=EPOCHS)
     model.save("my_model")
 
 
