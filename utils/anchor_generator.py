@@ -25,8 +25,10 @@ class AnchorBox:
         self.scales = [2 ** x for x in [0, 1 / 3, 2 / 3]]
 
         self._num_anchors = len(self.aspect_ratios) * len(self.scales)
-        self._strides = [2 ** i for i in range(3, 8)]
-        self._areas = [x ** 2 for x in [32.0, 64.0, 128.0, 256.0, 512.0]]
+        # self._strides = [2 ** i for i in range(3, 8)]
+        self._strides = [2 ** i for i in range(3, 7)]
+        # self._areas = [x ** 2 for x in [32.0, 64.0, 128.0, 256.0, 512.0]]
+        self._areas = [x ** 2 for x in [32.0, 64.0, 128.0, 256.0]]
         self._anchor_dims = self._compute_dims()
 
     def _compute_dims(self):
@@ -90,6 +92,7 @@ class AnchorBox:
                 tf.math.ceil(image_width / 2 ** i),
                 i,
             )
-            for i in range(3, 8)
+            # for i in range(3, 8)
+            for i in range(3, 7)
         ]
         return tf.concat(anchors, axis=0)

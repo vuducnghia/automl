@@ -25,7 +25,7 @@ class FeaturePyramid(Layer):
         self.conv_c4_3x3 = Conv2D(256, 3, 1, "same")
         self.conv_c5_3x3 = Conv2D(256, 3, 1, "same")
         self.conv_c6_3x3 = Conv2D(256, 3, 2, "same")
-        self.conv_c7_3x3 = Conv2D(256, 3, 2, "same")
+        # self.conv_c7_3x3 = Conv2D(256, 3, 2, "same")
         self.upsample_2x = UpSampling2D(2)
 
     def call(self, features, training=False):
@@ -40,6 +40,7 @@ class FeaturePyramid(Layer):
         p4_output = self.conv_c4_3x3(p4_output)
         p5_output = self.conv_c5_3x3(p5_output)
         p6_output = self.conv_c6_3x3(c5_output)
-        p7_output = self.conv_c7_3x3(tf.nn.relu(p6_output))
+        # p7_output = self.conv_c7_3x3(tf.nn.relu(p6_output))
 
-        return p3_output, p4_output, p5_output, p6_output, p7_output
+        # return p3_output, p4_output, p5_output, p6_output, p7_output
+        return p3_output, p4_output, p5_output, p6_output
