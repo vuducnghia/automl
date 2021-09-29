@@ -1,6 +1,7 @@
 import tensorflow as tf
-
 from utils.convert_box import swap_xy, convert_to_xywh
+from configs import INPUT_SHAPE
+from keras.applications.vgg16 import preprocess_input
 
 
 def random_flip_horizontal(image, boxes):
@@ -23,7 +24,7 @@ def random_flip_horizontal(image, boxes):
     return image, boxes
 
 
-def preprocess_data(sample, resize_shape=(512, 512)):
+def preprocess_data(sample):
     """Applies preprocessing step to a single sample
 
     Arguments:
@@ -41,17 +42,17 @@ def preprocess_data(sample, resize_shape=(512, 512)):
     class_id = tf.cast(sample["objects"]["label"], dtype=tf.int32)
 
     image, bbox = random_flip_horizontal(image, bbox)
-    image_shape = tf.cast(tf.shape(image)[:2], dtype=tf.float32)
-    image = tf.image.resize(image, resize_shape)
+    image = tf.image.resize(image, INPUT_SHAPE[:2])
 
     bbox = tf.stack(
         [
-            bbox[:, 0] * image_shape[1] / resize_shape[1],
-            bbox[:, 1] * image_shape[0] / resize_shape[0],
-            bbox[:, 2] * image_shape[1] / resize_shape[1],
-            bbox[:, 3] * image_shape[0] / resize_shape[0],
+            bbox[:, 0] * INPUT_SHAPE[1],
+            bbox[:, 1] * INPUT_SHAPE[0],
+            bbox[:, 2] * INPUT_SHAPE[1],
+            bbox[:, 3] * INPUT_SHAPE[0],
         ],
         axis=-1,
     )
+    print(bbox)
     bbox = convert_to_xywh(bbox)
     return image, bbox, class_id

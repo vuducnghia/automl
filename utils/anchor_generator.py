@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+from configs import LEVEL_FEATURE_PYRAMID, AREA_FEATURE_MAP
 
 class AnchorBox:
     """Generates anchor boxes.
@@ -26,9 +26,9 @@ class AnchorBox:
 
         self._num_anchors = len(self.aspect_ratios) * len(self.scales)
         # self._strides = [2 ** i for i in range(3, 8)]
-        self._strides = [2 ** i for i in range(3, 7)]
+        self._strides = [2 ** i for i in LEVEL_FEATURE_PYRAMID]
         # self._areas = [x ** 2 for x in [32.0, 64.0, 128.0, 256.0, 512.0]]
-        self._areas = [x ** 2 for x in [32.0, 64.0, 128.0, 256.0]]
+        self._areas = [x ** 2 for x in AREA_FEATURE_MAP]
         self._anchor_dims = self._compute_dims()
 
     def _compute_dims(self):
@@ -93,6 +93,6 @@ class AnchorBox:
                 i,
             )
             # for i in range(3, 8)
-            for i in range(3, 7)
+            for i in LEVEL_FEATURE_PYRAMID
         ]
         return tf.concat(anchors, axis=0)

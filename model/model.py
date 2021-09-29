@@ -4,19 +4,17 @@ from .head import build_head
 import tensorflow as tf
 import numpy as np
 import os
-from model.backbone import get_backbone
+from model.backbone import BackBone
 from model.loss import Loss
 from keras_tuner import HyperModel
 
 
 class ObjectDetectionNet(Model):
-
     def __init__(self, hp, num_classes):
         super(ObjectDetectionNet, self).__init__(name="ObjectDetectionNet")
         self.num_classes = num_classes
 
-        self.backbone = get_backbone(hp)
-        # self.backbone = get_backbone(hp, "MobileNetV2")
+        self.backbone = BackBone(hp).get()
         self.fpn = FeaturePyramid()
 
         prior_probability = tf.constant_initializer(-np.log((1 - 0.01) / 0.01))
@@ -24,8 +22,8 @@ class ObjectDetectionNet(Model):
         self.box_head = build_head(9 * 4, "zeros")
 
     def call(self, image, training=False):
-        features = self.backbone(image)
-        features = self.fpn(features, training=training)
+        features = self.backbone(image, training=training)
+        features = self.fpn(features)
         N = tf.shape(image)[0]
         cls_outputs = []
         box_outputs = []
@@ -61,6 +59,7 @@ class ODHyperModel(HyperModel):
 
         return learning_rate_fn
 
+
 def setup_learning_rate():
     learning_rates = [2.5e-06, 0.000625, 0.00125, 0.0025, 0.00025, 2.5e-05]
     learning_rate_boundaries = [125, 250, 500, 240000, 360000]
@@ -69,6 +68,7 @@ def setup_learning_rate():
     )
 
     return learning_rate_fn
+
 
 def setup_callback(model_dir="my_model"):
     callbacks_list = [

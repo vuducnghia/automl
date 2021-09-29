@@ -1,6 +1,8 @@
 from tensorflow.keras.layers import Layer, Conv2D, UpSampling2D
-from .backbone import get_backbone
+from tensorflow.keras.models import Model
+from configs import LEVEL_FEATURE_PYRAMID
 import tensorflow as tf
+
 
 class FeaturePyramid(Layer):
     """Builds the Feature Pyramid with the feature maps from the backbone.
@@ -16,7 +18,7 @@ class FeaturePyramid(Layer):
         P7 is included additionally to improve the accuracy of large object detection.
     """
 
-    def __init__(self,  **kwargs):
+    def __init__(self, **kwargs):
         super(FeaturePyramid, self).__init__(name="FeaturePyramid", **kwargs)
         self.conv_c3_1x1 = Conv2D(256, 1, 1, "same")
         self.conv_c4_1x1 = Conv2D(256, 1, 1, "same")
@@ -25,7 +27,7 @@ class FeaturePyramid(Layer):
         self.conv_c4_3x3 = Conv2D(256, 3, 1, "same")
         self.conv_c5_3x3 = Conv2D(256, 3, 1, "same")
         self.conv_c6_3x3 = Conv2D(256, 3, 2, "same")
-        # self.conv_c7_3x3 = Conv2D(256, 3, 2, "same")
+        self.conv_c7_3x3 = Conv2D(256, 3, 2, "same")
         self.upsample_2x = UpSampling2D(2)
 
     def call(self, features, training=False):
@@ -39,8 +41,14 @@ class FeaturePyramid(Layer):
         p3_output = self.conv_c3_3x3(p3_output)
         p4_output = self.conv_c4_3x3(p4_output)
         p5_output = self.conv_c5_3x3(p5_output)
-        p6_output = self.conv_c6_3x3(c5_output)
-        # p7_output = self.conv_c7_3x3(tf.nn.relu(p6_output))
 
-        # return p3_output, p4_output, p5_output, p6_output, p7_output
-        return p3_output, p4_output, p5_output, p6_output
+        if LEVEL_FEATURE_PYRAMID[-1] == 6:
+            p6_output = self.conv_c6_3x3(c5_output)
+
+            return p3_output, p4_output, p5_output, p6_output
+
+        elif LEVEL_FEATURE_PYRAMID[-1] == 7:
+            p6_output = self.conv_c6_3x3(c5_output)
+            p7_output = self.conv_c7_3x3(tf.nn.relu(p6_output))
+
+            return p3_output, p4_output, p5_output, p6_output, p7_output
