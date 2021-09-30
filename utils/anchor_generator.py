@@ -92,7 +92,6 @@ class AnchorBox:
                 tf.math.ceil(image_width / 2 ** i),
                 i,
             )
-            # for i in range(3, 8)
             for i in LEVEL_FEATURE_PYRAMID
         ]
         return tf.concat(anchors, axis=0)
