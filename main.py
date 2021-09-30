@@ -7,7 +7,7 @@ from utils.preprocessing import preprocess_data
 from utils.encode_label import LabelEncoder
 from model.model import setup_callback, ODHyperModel, ObjectDetectionNet
 from keras_tuner import RandomSearch
-from configs import NUM_CLASSES, BATCH_SIZE, EPOCHS
+from configs import NUM_CLASSES, BATCH_SIZE, EPOCHS, LEARNING_RATE
 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -77,7 +77,7 @@ def main():
     model = ObjectDetectionNet(None, NUM_CLASSES)
     # model.build((None,512, 512, 3))
 
-    optimizer = tf.optimizers.SGD(learning_rate=0.01, momentum=0.9)
+    optimizer = tf.optimizers.SGD(learning_rate=LEARNING_RATE, momentum=0.9)
     loss_fn = Loss(NUM_CLASSES)
     model.compile(loss=loss_fn, optimizer=optimizer)
     model.fit(train_dataset.take(20000), validation_data=val_dataset, epochs=EPOCHS)

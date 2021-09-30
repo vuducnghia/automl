@@ -42,7 +42,10 @@ class FeaturePyramid(Layer):
         p4_output = self.conv_c4_3x3(p4_output)
         p5_output = self.conv_c5_3x3(p5_output)
 
-        if LEVEL_FEATURE_PYRAMID[-1] == 6:
+        if LEVEL_FEATURE_PYRAMID[-1] == 5:
+            return p3_output, p4_output, p5_output
+
+        elif LEVEL_FEATURE_PYRAMID[-1] == 6:
             p6_output = self.conv_c6_3x3(c5_output)
 
             return p3_output, p4_output, p5_output, p6_output
