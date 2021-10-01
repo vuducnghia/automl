@@ -7,7 +7,7 @@ from utils.preprocessing import preprocess_data
 from utils.encode_label import LabelEncoder
 from model.model import setup_callback, ODHyperModel, ObjectDetectionNet
 from keras_tuner import RandomSearch
-from configs import NUM_CLASSES, BATCH_SIZE, EPOCHS, LEARNING_RATE
+from configs import NUM_CLASSES, BATCH_SIZE, EPOCHS, LEARNING_RATES, LEARNING_RATE_BOUNDARIES
 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -29,7 +29,7 @@ def create_dataset():
                                                padding_values=(0.0, 1e-8, -1),
                                                drop_remainder=True)
     train_dataset = train_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
-    # train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
+    train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
     train_dataset = train_dataset.prefetch(autotune)
 
     val_dataset = val_dataset.map(preprocess_data, num_parallel_calls=autotune)
@@ -37,7 +37,7 @@ def create_dataset():
                                            padding_values=(0.0, 1e-8, -1),
                                            drop_remainder=True)
     val_dataset = val_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
-    # val_dataset = val_dataset.apply(tf.data.experimental.ignore_errors())
+    val_dataset = val_dataset.apply(tf.data.experimental.ignore_errors())
     val_dataset = val_dataset.prefetch(autotune)
 
     return train_dataset, val_dataset, dataset_info
@@ -76,8 +76,10 @@ def main():
     # best_model.save("best_model")
     model = ObjectDetectionNet(None, NUM_CLASSES)
     # model.build((None,512, 512, 3))
-
-    optimizer = tf.optimizers.SGD(learning_rate=LEARNING_RATE, momentum=0.9)
+    learning_rate_fn = tf.optimizers.schedules.PiecewiseConstantDecay(
+        boundaries=LEARNING_RATE_BOUNDARIES, values=LEARNING_RATES
+    )
+    optimizer = tf.optimizers.SGD(learning_rate=learning_rate_fn, momentum=0.9)
     loss_fn = Loss(NUM_CLASSES)
     model.compile(loss=loss_fn, optimizer=optimizer)
     model.fit(train_dataset.take(20000), validation_data=val_dataset, epochs=EPOCHS)
