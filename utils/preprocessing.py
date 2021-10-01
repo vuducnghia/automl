@@ -52,6 +52,6 @@ def preprocess_data(sample):
         ],
         axis=-1,
     )
-    print(bbox)
+
     bbox = convert_to_xywh(bbox)
     return image, bbox, class_id
