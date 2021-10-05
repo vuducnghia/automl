@@ -1,13 +1,12 @@
 import tensorflow as tf
-from tensorflow import keras
 import tensorflow_datasets as tfds
 
 from model.loss import Loss
 from utils.preprocessing import preprocess_data
 from utils.encode_label import LabelEncoder
-from model.model import setup_callback, ODHyperModel, ObjectDetectionNet
+from model.model import ODHyperModel, ObjectDetectionNet
 from keras_tuner import RandomSearch
-from configs import NUM_CLASSES, BATCH_SIZE, EPOCHS, LEARNING_RATES, LEARNING_RATE_BOUNDARIES
+from configs import NUM_CLASSES, BATCH_SIZE, EPOCHS, LEARNING_RATES, LEARNING_RATE_BOUNDARIES, EPOCHS_TUNER, MAX_TRIALS
 
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -29,7 +28,7 @@ def create_dataset():
                                                padding_values=(0.0, 1e-8, -1),
                                                drop_remainder=True)
     train_dataset = train_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
-    # train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
+    train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
     train_dataset = train_dataset.prefetch(autotune)
 
     val_dataset = val_dataset.map(preprocess_data, num_parallel_calls=autotune)
@@ -51,39 +50,37 @@ def main():
     print(dataset_info.splits["train"].num_examples)
     print(dataset_info.splits["validation"].num_examples)
 
-    # hypermodel = ODHyperModel(num_classes=80)
-    # tuner = RandomSearch(
-    #     hypermodel,
-    #     objective="val_loss",
-    #     max_trials=2,
-    #     executions_per_trial=1,
-    #     overwrite=True,
-    #     directory="my_dir",
-    #     project_name="helloworld",
-    # )
-    # tuner.search_space_summary()
-    # tuner.search(
-    #     train_dataset,
-    #     epochs=1,
-    #     validation_data=val_dataset,
-    #     steps_per_epoch=1,
-    #     validation_steps=1,
-    #     # callbacks=setup_callback
-    # )
-
-    # best_model = tuner.get_best_models(num_models=1)[0]
-    # best_model.fit(train_dataset, )
-    # best_model.save("best_model")
-    model = ObjectDetectionNet(None, NUM_CLASSES)
-    # model.build((None,512, 512, 3))
-    learning_rate_fn = tf.optimizers.schedules.PiecewiseConstantDecay(
-        boundaries=LEARNING_RATE_BOUNDARIES, values=LEARNING_RATES
+    hypermodel = ODHyperModel(num_classes=80)
+    tuner = RandomSearch(
+        hypermodel,
+        objective="val_loss",
+        max_trials=MAX_TRIALS,
+        executions_per_trial=1,
+        overwrite=True,
+        directory="my_dir",
+        project_name="helloworld",
     )
-    optimizer = tf.optimizers.SGD(learning_rate=learning_rate_fn, momentum=0.9)
-    loss_fn = Loss(NUM_CLASSES)
-    model.compile(loss=loss_fn, optimizer=optimizer)
-    model.fit(train_dataset.take(20000), validation_data=val_dataset, epochs=EPOCHS)
-    model.save("my_model")
+    tuner.search_space_summary()
+    tuner.search(
+        train_dataset.take(1),
+        epochs=EPOCHS_TUNER,
+        validation_data=val_dataset.take(1),
+    )
+
+    best_model = tuner.get_best_models()[0]
+    # best_model.build((None, 448, 448, 3))
+    # best_model.summary()
+    best_model.fit(train_dataset.take(1), validation_data=val_dataset.take(1), epochs=EPOCHS)
+    best_model.save("best_model")
+    # model = ObjectDetectionNet(None, NUM_CLASSES)
+    # learning_rate_fn = tf.optimizers.schedules.PiecewiseConstantDecay(
+    #     boundaries=LEARNING_RATE_BOUNDARIES, values=LEARNING_RATES
+    # )
+    # optimizer = tf.optimizers.SGD(learning_rate=learning_rate_fn, momentum=0.9)
+    # loss_fn = Loss(NUM_CLASSES)
+    # model.compile(loss=loss_fn, optimizer=optimizer)
+    # model.fit(train_dataset.take(20000), validation_data=val_dataset, epochs=EPOCHS)
+    # model.save("my_model")
 
 
 if __name__ == "__main__":

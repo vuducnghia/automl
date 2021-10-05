@@ -3,10 +3,10 @@ from .feature_pyramid import FeaturePyramid
 from .head import build_head
 import tensorflow as tf
 import numpy as np
-import os
 from model.backbone import BackBone
 from model.loss import Loss
 from keras_tuner import HyperModel
+from configs import LEARNING_RATES, LEARNING_RATE_BOUNDARIES
 
 
 class ObjectDetectionNet(Model):
@@ -39,7 +39,9 @@ class ObjectDetectionNet(Model):
 class ODHyperModel(HyperModel):
     def __init__(self, num_classes):
         self.num_classes = num_classes
-        self.learning_rate_fn = self.setup_learning_rate()
+        self.learning_rate_fn = tf.optimizers.schedules.PiecewiseConstantDecay(
+            boundaries=LEARNING_RATE_BOUNDARIES, values=LEARNING_RATES
+        )
         self.loss_fn = Loss(num_classes)
         self.optimizer = tf.optimizers.SGD(learning_rate=self.learning_rate_fn, momentum=0.9)
 
@@ -50,35 +52,3 @@ class ODHyperModel(HyperModel):
 
         return model
 
-    def setup_learning_rate(self):
-        learning_rates = [2.5e-06, 0.000625, 0.00125, 0.0025, 0.00025, 2.5e-05]
-        learning_rate_boundaries = [125, 250, 500, 240000, 360000]
-        learning_rate_fn = tf.optimizers.schedules.PiecewiseConstantDecay(
-            boundaries=learning_rate_boundaries, values=learning_rates
-        )
-
-        return learning_rate_fn
-
-
-def setup_learning_rate():
-    learning_rates = [2.5e-06, 0.000625, 0.00125, 0.0025, 0.00025, 2.5e-05]
-    learning_rate_boundaries = [125, 250, 500, 240000, 360000]
-    learning_rate_fn = tf.optimizers.schedules.PiecewiseConstantDecay(
-        boundaries=learning_rate_boundaries, values=learning_rates
-    )
-
-    return learning_rate_fn
-
-
-def setup_callback(model_dir="my_model"):
-    callbacks_list = [
-        tf.keras.callbacks.ModelCheckpoint(
-            filepath=os.path.join(model_dir, "weights" + "_epoch_{epoch}"),
-            monitor="loss",
-            save_best_only=False,
-            save_weights_only=True,
-            verbose=1,
-        )
-    ]
-
-    return callbacks_list
