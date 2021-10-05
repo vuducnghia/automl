@@ -5,7 +5,7 @@ from utils.convert_box import convert_to_corners
 
 
 class DecodePredictions():
-    """A Keras layer that decodes predictions of the RetinaNet model.
+    """
     Attributes:
       num_classes: Number of classes in the dataset
       confidence_threshold: Minimum class probability, below which detections
@@ -24,8 +24,8 @@ class DecodePredictions():
             num_classes=NUM_CLASSES,
             confidence_threshold=0.05,
             nms_iou_threshold=0.5,
-            max_detections_per_class=100,
-            max_detections=100,
+            max_detections_per_class=5,
+            max_detections=5,
             box_variance=[0.1, 0.1, 0.2, 0.2],
     ):
         self.num_classes = num_classes

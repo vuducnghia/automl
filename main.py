@@ -29,7 +29,7 @@ def create_dataset():
                                                padding_values=(0.0, 1e-8, -1),
                                                drop_remainder=True)
     train_dataset = train_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
-    train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
+    # train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
     train_dataset = train_dataset.prefetch(autotune)
 
     val_dataset = val_dataset.map(preprocess_data, num_parallel_calls=autotune)
