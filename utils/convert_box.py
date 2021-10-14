@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def swap_xy(boxes):
+def swapXY(boxes):
     """Swaps order the of x and y coordinates of the boxes.
 
     Arguments:
@@ -15,7 +15,7 @@ def swap_xy(boxes):
     return tf.stack([boxes[:, 1], boxes[:, 0], boxes[:, 3], boxes[:, 2]], axis=-1)
 
 
-def convert_to_xywh(boxes):
+def convertToxywh(boxes):
     """Changes the box format to center, width and height.
 
     Arguments:
@@ -49,7 +49,7 @@ def convert_to_corners(boxes):
     )
 
 
-def compute_iou(boxes1, boxes2):
+def computeIou(boxes1, boxes2):
     """Computes pairwise IOU matrix for given two sets of boxes
 
     Arguments:
@@ -77,7 +77,7 @@ def compute_iou(boxes1, boxes2):
     return tf.clip_by_value(intersection_area / union_area, 0.0, 1.0)
 
 
-def visualize_detections(image, boxes, classes, scores, figsize=(7, 7), linewidth=1, color=[0, 0, 1]):
+def visualizeDetections(image, boxes, classes, scores, figsize=(7, 7), linewidth=1, color=[0, 0, 1]):
     """Visualize Detections"""
     image = np.array(image, dtype=np.uint8)
     plt.figure(figsize=figsize)

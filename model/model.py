@@ -1,6 +1,6 @@
 from tensorflow.keras import Model
 from .feature_pyramid import FeaturePyramid
-from .head import build_head
+from .head import buildHead
 import tensorflow as tf
 import numpy as np
 from model.backbone import BackBone
@@ -18,8 +18,8 @@ class ObjectDetectionNet(Model):
         self.fpn = FeaturePyramid()
 
         prior_probability = tf.constant_initializer(-np.log((1 - 0.01) / 0.01))
-        self.cls_head = build_head(9 * num_classes, prior_probability)
-        self.box_head = build_head(9 * 4, "zeros")
+        self.cls_head = buildHead(9 * num_classes, prior_probability)
+        self.box_head = buildHead(9 * 4, "zeros")
 
     def call(self, image, training=False):
         features = self.backbone(image, training=training)

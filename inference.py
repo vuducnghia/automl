@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def visualize_detections(image, pred_boxes, gt_boxes, classes, scores, figsize=(7, 7), linewidth=1, color=[0, 0, 1]):
+def visualizeDetections(image, pred_boxes, gt_boxes, classes, scores, figsize=(7, 7), linewidth=1, color=[0, 0, 1]):
     """Visualize Detections"""
     image = np.array(image, dtype=np.uint8)
 
@@ -53,14 +53,14 @@ def visualize_detections(image, pred_boxes, gt_boxes, classes, scores, figsize=(
     plt.show()
 
 
-def prepare_image(image):
+def prepareImage(image):
     image = tf.image.resize(image, INPUT_SHAPE[:2])
     image /= 127.5
     image -= 1.
     return tf.expand_dims(image, axis=0)
 
 
-def compute_iou(boxA, boxB):
+def computeIou(boxA, boxB):
     xA = max(boxA[0], boxB[0])
     yA = max(boxA[1], boxB[1])
     xB = min(boxA[2], boxB[2])
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     for sample in val_dataset.take(1):
         image = tf.cast(sample["image"], dtype=tf.float32)
         image_shape = image.shape
-        input_image = prepare_image(image)
+        input_image = prepareImage(image)
 
         predictions = model.predict(input_image)
 
@@ -125,7 +125,7 @@ if __name__ == "__main__":
                     y_min, x_min, y_max, x_max = bbox_gts[j]
                     x1, y1, x2, y2 = bbox_dets[i] / INPUT_SHAPE[1]
 
-                    iou = compute_iou((x_min, y_min, x_min + x_max, y_min + y_max), (x1, y1, x2, y2))
+                    iou = computeIou((x_min, y_min, x_min + x_max, y_min + y_max), (x1, y1, x2, y2))
                     print("iou: ", iou)
                     if iou >= 0.5:
                         metrics[label_pred]["tp"] += 1
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     ap, map = calculateAP(metrics)
     print(ap)
     print(map)
-    # visualize_detections(
+    # visualizeDetections(
     #     image,
     #     detections.nmsed_boxes[0][:num_detections],
     #     bbox_gts,

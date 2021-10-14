@@ -2,7 +2,7 @@ from tensorflow.keras.layers import InputLayer, Conv2D, ReLU
 import tensorflow as tf
 
 
-def build_head(output_filters, bias_init):
+def buildHead(output_filters, bias_init):
     """Builds the class/box predictions head.
 
     Arguments:

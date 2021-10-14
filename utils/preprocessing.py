@@ -1,9 +1,10 @@
 import tensorflow as tf
-from utils.convert_box import swap_xy, convert_to_xywh
+from utils.convert_box import swapXY, convertToxywh
 from configs import INPUT_SHAPE
+import urllib.request
 
 
-def random_flip_horizontal(image, boxes):
+def randomFlipHorizontal(image, boxes):
     """Flips image and boxes horizontally with 50% chance
 
     Arguments:
@@ -23,7 +24,7 @@ def random_flip_horizontal(image, boxes):
     return image, boxes
 
 
-def preprocess_data(sample):
+def preprocessData(sample):
     """Applies preprocessing step to a single sample
 
     Arguments:
@@ -37,10 +38,10 @@ def preprocess_data(sample):
         shape `(num_objects,)`.
     """
     image = sample["image"]
-    bbox = swap_xy(sample["objects"]["bbox"])
+    bbox = swapXY(sample["objects"]["bbox"])
     class_id = tf.cast(sample["objects"]["label"], dtype=tf.int32)
 
-    image, bbox = random_flip_horizontal(image, bbox)
+    image, bbox = randomFlipHorizontal(image, bbox)
     image = tf.image.resize(image, INPUT_SHAPE[:2])
 
     bbox = tf.stack(
@@ -53,5 +54,17 @@ def preprocess_data(sample):
         axis=-1,
     )
 
-    bbox = convert_to_xywh(bbox)
+    bbox = convertToxywh(bbox)
     return image, bbox, class_id
+
+
+def downloadImageCoCo(data_json, folder_image="data"):
+    id_labels = {}
+    for img in data_json["images"]:
+        name = img["id"]
+        urllib.request.urlretrieve(img["coco_url"], f"{folder_image}/{name}.jpg")
+        id_labels[name] = img["category_id"]
+    for category in data_json["categories"]:
+        ID_CLASSES.append(category["id"])
+    print("\nID_CLASSES: ", ID_CLASSES)
+    return data, id_labels

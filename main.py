@@ -2,7 +2,7 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 
 from model.loss import Loss
-from utils.preprocessing import preprocess_data
+from utils.preprocessing import preprocessData
 from utils.encode_label import LabelEncoder
 from model.model import ODHyperModel, ObjectDetectionNet
 from keras_tuner import RandomSearch
@@ -22,7 +22,7 @@ def create_dataset():
     label_encoder = LabelEncoder()
     autotune = tf.data.AUTOTUNE
 
-    train_dataset = train_dataset.map(preprocess_data, num_parallel_calls=autotune)
+    train_dataset = train_dataset.map(preprocessData, num_parallel_calls=autotune)
     train_dataset = train_dataset.shuffle(8 * BATCH_SIZE)
     train_dataset = train_dataset.padded_batch(BATCH_SIZE,
                                                padding_values=(0.0, 1e-8, -1),
@@ -31,7 +31,7 @@ def create_dataset():
     train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
     train_dataset = train_dataset.prefetch(autotune)
 
-    val_dataset = val_dataset.map(preprocess_data, num_parallel_calls=autotune)
+    val_dataset = val_dataset.map(preprocessData, num_parallel_calls=autotune)
     val_dataset = val_dataset.padded_batch(BATCH_SIZE,
                                            padding_values=(0.0, 1e-8, -1),
                                            drop_remainder=True)

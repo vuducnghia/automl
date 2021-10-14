@@ -1,6 +1,6 @@
 import tensorflow as tf
 from .anchor_generator import AnchorBox
-from .convert_box import compute_iou
+from .convert_box import computeIou
 
 
 class LabelEncoder:
@@ -52,7 +52,7 @@ class LabelEncoder:
           ignore_mask: A mask for anchor boxes that need to by ignored during
             training
         """
-        iou_matrix = compute_iou(anchor_boxes, gt_boxes)
+        iou_matrix = computeIou(anchor_boxes, gt_boxes)
         max_iou = tf.reduce_max(iou_matrix, axis=1)
         matched_gt_idx = tf.argmax(iou_matrix, axis=1)
         positive_mask = tf.greater_equal(max_iou, match_iou)
