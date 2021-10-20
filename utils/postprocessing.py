@@ -1,5 +1,5 @@
 import tensorflow as tf
-from configs import NUM_CLASSES, INPUT_SHAPE
+from configs import INPUT_SHAPE
 from utils.anchor_generator import AnchorBox
 from utils.convert_box import convert_to_corners
 
@@ -21,7 +21,7 @@ class DecodePredictions():
 
     def __init__(
             self,
-            num_classes=NUM_CLASSES,
+            num_classes=None,
             confidence_threshold=0.05,
             nms_iou_threshold=0.5,
             max_detections_per_class=5,

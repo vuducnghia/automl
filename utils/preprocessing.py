@@ -4,6 +4,20 @@ import urllib.request
 from pycocotools.coco import COCO
 import os
 
+from utils.convert_box import swapXY, convertToxywh
+
+
+def downloadImages(coco, img_dir="data"):
+    # if os.path.isdir(img_dir):
+    #     os.system(f"rm -rf {img_dir}")
+    #     os.mkdir(img_dir)
+
+    for img in coco.imgs:
+        try:
+            urllib.request.urlretrieve(img["coco_url"], f"{img_dir}/{img['id']}.jpg")
+        except:
+            print(f"error when download {img['id']}")
+
 
 def getAnnotations(coco, imgId, width, height):
     annIds = coco.getAnnIds(imgIds=imgId)
@@ -29,11 +43,13 @@ def createTfRecordDataset(img_dir="data", annotations_file='test.json', records_
     coco = COCO(annotations_file)
     imgIds = coco.getImgIds()
     n = len(imgIds)
+    num_classes = len(coco.cats)
     total_tfrecords = n // num_samples
     if n % num_samples:
         total_tfrecords += 1
     print("{} TFRecord files will be created".format(total_tfrecords))
 
+    # downloadImages(coco, img_dir)
     for i in range(0, total_tfrecords):
         examples = []
         start = i * num_samples
@@ -41,7 +57,7 @@ def createTfRecordDataset(img_dir="data", annotations_file='test.json', records_
         imgids = imgIds[start:end]
 
         for img in coco.loadImgs(imgids):
-            with open(str(img_dir) + str(img['id']) + ".jpg", 'rb') as f:
+            with open(str(img_dir) + "/" + str(img['id']) + ".jpg", 'rb') as f:
                 image_string = f.read()
 
             objects, catIds, bboxes = getAnnotations(coco, img['id'], img['width'], img['height'])
@@ -67,6 +83,7 @@ def createTfRecordDataset(img_dir="data", annotations_file='test.json', records_
                 writer.write(j.SerializeToString())
         examples.clear()
         print("file {} created".format(i))
+    return num_classes
 
 
 def randomFlipHorizontal(image, boxes):
@@ -87,6 +104,40 @@ def randomFlipHorizontal(image, boxes):
         image = tf.image.flip_left_right(image)
         boxes = tf.stack([1 - boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]], axis=-1)
     return image, boxes
+
+
+def preprocessDataCoCoTf(sample):
+    """Applies preprocessing step to a single sample
+
+    Arguments:
+        :param sample: A dict representing a single training sample.
+        :param resize_shape:
+    Returns:
+      image: Resized and padded image with random horizontal flipping applied.
+      bbox: Bounding boxes with the shape `(num_objects, 4)` where each box is
+        of the format `[x, y, width, height]`.
+      class_id: An tensor representing the class id of the objects, having
+        shape `(num_objects,)`.
+    """
+    image = sample["image"]
+    bbox = swapXY(sample["objects"]["bbox"])
+    class_id = tf.cast(sample["objects"]["label"], dtype=tf.int32)
+
+    image, bbox = randomFlipHorizontal(image, bbox)
+    image = tf.image.resize(image, INPUT_SHAPE[:2])
+
+    bbox = tf.stack(
+        [
+            bbox[:, 0] * INPUT_SHAPE[1],
+            bbox[:, 1] * INPUT_SHAPE[0],
+            bbox[:, 2] * INPUT_SHAPE[1],
+            bbox[:, 3] * INPUT_SHAPE[0],
+        ],
+        axis=-1,
+    )
+
+    bbox = convertToxywh(bbox)
+    return image, bbox, class_id
 
 
 def preprocessData(sample):
@@ -128,3 +179,6 @@ def preprocessData(sample):
     )
 
     return image, bbox, class_id
+
+
+createTfRecordDataset(annotations_file="../test.json")

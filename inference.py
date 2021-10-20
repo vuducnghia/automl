@@ -1,7 +1,7 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from utils.postprocessing import DecodePredictions
-from configs import INPUT_SHAPE, NUM_CLASSES
+from configs import INPUT_SHAPE
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -75,23 +75,24 @@ def computeIou(boxA, boxB):
     return iou
 
 
-def calculateAP(metrics):
-    AP = [0] * NUM_CLASSES
+def calculateAP(metrics, num_classes):
+    AP = [0] * num_classes
     for id, m in enumerate(metrics):
         try:
             AP[id] = m["tp"] / (m["tp"] + m["fp"])
         except ZeroDivisionError:
             AP[id] = 0
-    mAP = sum(AP) / NUM_CLASSES
+    mAP = sum(AP) / num_classes
     return AP, mAP
 
 
+num_classes = 80
 if __name__ == "__main__":
     (val_dataset), dataset_info = tfds.load("coco/2017", split="validation", with_info=True, data_dir="data")
     int2str = dataset_info.features["objects"]["label"].int2str
 
     model = tf.keras.models.load_model("my_model")
-    metrics = [{"tp": 0, "fp": 0} for i in range(0, NUM_CLASSES)]
+    metrics = [{"tp": 0, "fp": 0} for i in range(0, num_classes)]
     gts, dets = [], []
     for sample in val_dataset.take(1):
         image = tf.cast(sample["image"], dtype=tf.float32)
@@ -100,7 +101,7 @@ if __name__ == "__main__":
 
         predictions = model.predict(input_image)
 
-        detections = DecodePredictions(confidence_threshold=0.5).process(predictions)
+        detections = DecodePredictions(num_classes, confidence_threshold=0.5).process(predictions)
         num_detections = detections.valid_detections[0]
 
         class_names = [
@@ -139,7 +140,7 @@ if __name__ == "__main__":
             if not label:
                 metrics[label_gts[id]]["fp"] += 1
 
-    ap, map = calculateAP(metrics)
+    ap, map = calculateAP(metrics, num_classes)
     print(ap)
     print(map)
     # visualizeDetections(
