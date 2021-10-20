@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 def swapXY(boxes):
     """Swaps order the of x and y coordinates of the boxes.
-
+    [ymin, xmin, ymax, xmax]
     Arguments:
       boxes: A tensor with shape `(num_boxes, 4)` representing bounding boxes.
 

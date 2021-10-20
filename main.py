@@ -17,16 +17,22 @@ def create_dataset():
     (train_dataset, val_dataset), dataset_info = tfds.load("coco/2017",
                                                            split=["train", "validation"],
                                                            with_info=True,
-                                                           data_dir="data")
+                                                           data_dir="data_coco")
 
     label_encoder = LabelEncoder()
     autotune = tf.data.AUTOTUNE
+    for i in train_dataset.take(1):
+        print(preprocessData(i))
 
     train_dataset = train_dataset.map(preprocessData, num_parallel_calls=autotune)
-    train_dataset = train_dataset.shuffle(8 * BATCH_SIZE)
+
+    train_dataset = train_dataset.shuffle(1 * BATCH_SIZE)
     train_dataset = train_dataset.padded_batch(BATCH_SIZE,
                                                padding_values=(0.0, 1e-8, -1),
                                                drop_remainder=True)
+    # for i in train_dataset.take(1):
+    #     print(i)
+    #     label_encoder.encode_batch(i[0], i[1], i[2])
     train_dataset = train_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
     train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
     train_dataset = train_dataset.prefetch(autotune)
@@ -45,10 +51,30 @@ def create_dataset():
     # val_steps_per_epoch = dataset_info.splits["validation"].num_examples // BATCH_SIZE
 
 
+def loadDataset(records_path='tfrecords/'):
+    train_dataset = tf.data.TFRecordDataset(tf.io.gfile.glob(records_path + '*.tfrecord'))
+    label_encoder = LabelEncoder()
+    autotune = tf.data.AUTOTUNE
+
+    train_dataset = train_dataset.map(preprocessData, num_parallel_calls=autotune)
+    train_dataset = train_dataset.shuffle(8 * BATCH_SIZE)
+    train_dataset = train_dataset.padded_batch(BATCH_SIZE,
+                                               padding_values=(0.0, 1e-8, -1),
+                                               drop_remainder=True)
+    train_dataset = train_dataset.map(label_encoder.encode_batch, num_parallel_calls=autotune)
+    train_dataset = train_dataset.apply(tf.data.experimental.ignore_errors())
+    train_dataset = train_dataset.prefetch(autotune)
+    return train_dataset
+
+
 def main():
-    train_dataset, val_dataset, dataset_info = create_dataset()
-    print(dataset_info.splits["train"].num_examples)
-    print(dataset_info.splits["validation"].num_examples)
+    # train_dataset, val_dataset, dataset_info = create_dataset()
+    # for i in train_dataset.take(1):
+    #     print(i)
+    # print(dataset_info.splits["train"].num_examples)
+    # print(dataset_info.splits["validation"].num_examples)
+
+    train_dataset = loadDataset()
 
     hypermodel = ODHyperModel(num_classes=80)
     tuner = RandomSearch(
@@ -64,14 +90,13 @@ def main():
     tuner.search(
         train_dataset.take(1),
         epochs=EPOCHS_TUNER,
-        validation_data=val_dataset.take(1),
+        validation_data=train_dataset.take(1),
     )
 
     best_model = tuner.get_best_models()[0]
-    # best_model.build((None, 448, 448, 3))
-    # best_model.summary()
-    best_model.fit(train_dataset.take(1), validation_data=val_dataset.take(1), epochs=EPOCHS)
-    best_model.save("best_model")
+    best_model.fit(train_dataset, validation_data=train_dataset.take(1), epochs=EPOCHS)
+    # best_model.save("best_model")
+
     # model = ObjectDetectionNet(None, NUM_CLASSES)
     # learning_rate_fn = tf.optimizers.schedules.PiecewiseConstantDecay(
     #     boundaries=LEARNING_RATE_BOUNDARIES, values=LEARNING_RATES

@@ -1,0 +1,157 @@
+{
+    "info": {
+        "year": 2020,
+        "version": "1.0.0",
+        "description": "production by seta-international",
+        "contributor": null,
+        "url": null,
+        "date_created": 1634287076083
+    },
+    "images": [
+        {
+            "id": 504780,
+            "width": 1024,
+            "height": 683,
+            "file_name": "d3f1cf48491b3c7e.jpg",
+            "license": 0,
+            "flickr_url": null,
+            "coco_url": "https://salf-dev.s3.us-west-1.amazonaws.com/org_399/DATASET/1634098472435/d3f1cf48491b3c7ejpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVITPY2U4VCHWSYCG%2F20211015%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20211015T083755Z&X-Amz-Expires=7200&X-Amz-Signature=7330f06b07fcb5a6858f97063c086b6ec2a9183dbf7829ef6f552c76839d3f33&X-Amz-SignedHeaders=host",
+            "date_captured": 1634287076083
+        },
+        {
+            "id": 504779,
+            "width": 1024,
+            "height": 768,
+            "file_name": "e83ef1e6e20597ce.jpg",
+            "license": 0,
+            "flickr_url": null,
+            "coco_url": "https://salf-dev.s3.us-west-1.amazonaws.com/org_399/DATASET/1634098472435/e83ef1e6e2597cejpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVITPY2U4VCHWSYCG%2F20211015%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20211015T083755Z&X-Amz-Expires=7200&X-Amz-Signature=afd5ed4dd4f02d77ad26794f3c896f9fbcea6e6f83a93d5b15266b6aeaf51e67&X-Amz-SignedHeaders=host",
+            "date_captured": 1634287076083
+        },
+        {
+            "id": 504823,
+            "width": 1024,
+            "height": 768,
+            "file_name": "61630c379c926f6a.jpg",
+            "license": 0,
+            "flickr_url": null,
+            "coco_url": "https://salf-dev.s3.us-west-1.amazonaws.com/org_399/DATASET/1634098472435/6163c379c926f6ajpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVITPY2U4VCHWSYCG%2F20211015%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20211015T083755Z&X-Amz-Expires=7200&X-Amz-Signature=df5a52d75a5bf43155872597cdd974f0b045a14ceae85cb812827a8bd6eda956&X-Amz-SignedHeaders=host",
+            "date_captured": 1634287076083
+        },
+        {
+            "id": 504820,
+            "width": 659,
+            "height": 1024,
+            "file_name": "4e80f86ddebbd803.jpg",
+            "license": 0,
+            "flickr_url": null,
+            "coco_url": "https://salf-dev.s3.us-west-1.amazonaws.com/org_399/DATASET/1634098472435/4e8f86ddebbd83jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVITPY2U4VCHWSYCG%2F20211015%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20211015T083755Z&X-Amz-Expires=7200&X-Amz-Signature=832f0ef4ac6c22e5f3855970a91fc2d255e070a4fab12f6f9003dbd44e31fbec&X-Amz-SignedHeaders=host",
+            "date_captured": 1634287076083
+        }
+    ],
+    "annotations": [
+        {
+            "id": 0,
+            "image_id": 504780,
+            "category_id": 0,
+            "segmentation": null,
+            "area": 0,
+            "bbox": [
+                313.71801409580877,
+                4.457854326271772,
+                558.1418620856989,
+                677.3895881111457
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 0,
+            "image_id": 504779,
+            "category_id": 0,
+            "segmentation": null,
+            "area": 0,
+            "bbox": [
+                175.29883229855542,
+                185.37202011201495,
+                814.1429294956727,
+                450.981705220373
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 0,
+            "image_id": 504823,
+            "category_id": 1,
+            "segmentation": null,
+            "area": 0,
+            "bbox": [
+                175.29883229855542,
+                185.37202011201495,
+                814.1429294956727,
+                450.981705220373
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 0,
+            "image_id": 504820,
+            "category_id": 0,
+            "segmentation": null,
+            "area": 0,
+            "bbox": [
+                100.85987503282063,
+                716.7367875261787,
+                117.80582681415062,
+                238.40769131666536
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 0,
+            "image_id": 504820,
+            "category_id": 0,
+            "segmentation": null,
+            "area": 0,
+            "bbox": [
+                408.30434988926254,
+                621.948187364131,
+                136.48236033346723,
+                94.78860016204771
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 0,
+            "image_id": 504820,
+            "category_id": 0,
+            "segmentation": null,
+            "area": 0,
+            "bbox": [
+                316.35833871724253,
+                665.0339147105162,
+                103.43926256852251,
+                116.33146383524036
+            ],
+            "iscrowd": 0
+        }
+    ],
+    "categories": [
+        {
+            "id": 0,
+            "name": "kangaroo",
+            "color": "rgb(248, 231, 28)"
+        },
+        {
+            "id": 1,
+            "name": "raccoon",
+            "color": "rgb(192, 58, 58)"
+        }
+    ],
+    "licenses": [
+        {
+            "id": 0,
+            "name": "product by seta-international",
+            "url": null
+        }
+    ]
+}
